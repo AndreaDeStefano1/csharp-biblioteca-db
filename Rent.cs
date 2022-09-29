@@ -1,16 +1,17 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿
+
+
 class Rent
 {
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
-    public string Name { get; set; }
-    public string UserFullName { get; set; }
+    public int NameId { get; set; }
+    public int DocumentId { get; set; }
 
-    public Rent(DateOnly startDate, DateOnly endDate, string name, string userFullName)
-    {
+    public Rent(DateOnly startDate, DateOnly endDate, int userId, int documentId) { 
         StartDate = startDate;
         EndDate = endDate;
-        Name = name;
-        UserFullName = userFullName;
+        NameId = userId;
+        DocumentId = documentId;
     }
 }
