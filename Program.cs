@@ -1,5 +1,4 @@
-﻿
-
+﻿#region CREAZIONE TABELLE
 //CREATE TABLE[dbo].[document] (
 //[id]  BIGINT PRIMARY KEY  IDENTITY  NOT NULL,
 //[code] VARCHAR (255) NOT NULL,
@@ -33,45 +32,66 @@
 //    [created_at] DATETIME DEFAULT (NULL) NULL,
 //    [updated_at] DATETIME DEFAULT(NULL) NULL,
 //    PRIMARY KEY CLUSTERED ([id] ASC)
-//);
-
-
+//); 
+#endregion
 using System.Data.SqlClient;
 
 
+bool exit = false;
 
-
-int choice = Convert.ToInt32(StringInput("Cosa vuoi fare?"));
-
-
-switch (choice)
+while (!exit)
 {
-    case 1:
+    Console.WriteLine("\n\n");
+    ShowMenu();
+    int choice = Convert.ToInt32(StringInput("Cosa vuoi fare?"));
 
-        string code = StringInput("Inserisci il codice:");
-        string title = StringInput("Inserisci il titolo:");
-        int year = Convert.ToInt32(StringInput("Inserisci l'anno:"));
-        string sector = StringInput("Inserisci il genere:");
-        int available = StringInput("Inserisci se è disponibile:") == "si" ? 1 : 0;
-        string position = StringInput("Inserisci il  :");
-        string author = StringInput("Inserisci il  :");
-        string type = StringInput("Inserisci il  :");
-        int timeOrPages;
-        if(type == "libro" || type == "Libro")
-        {
-            timeOrPages = Convert.ToInt32(StringInput("Inserisci il numero di pagine:"));
-        }
-        else
-        {
-            timeOrPages = Convert.ToInt32(StringInput("Inserisci la durata:"));
-        }
+    switch (choice)
+    {
+        case 1:
 
-        AddDocument(code, title, year, sector, available, position, author, type, varX);
+            string code = StringInput("\nInserisci il codice:");
+            string title = StringInput("\nInserisci il titolo:");
+            int year = Convert.ToInt32(StringInput("\nInserisci l'anno:"));
+            string sector = StringInput("\nInserisci il genere:");
+            int available = StringInput("\nInserisci se è disponibile:") == "si" ? 1 : 0;
+            string position = StringInput("\nInserisci il  :");
+            string author = StringInput("\nInserisci il  :");
+            string type = StringInput("\nInserisci il  :");
+            int timeOrPages;
+            if (type == "libro" || type == "Libro")
+            {
+                timeOrPages = Convert.ToInt32(StringInput("\nInserisci il numero di pagine:"));
+            }
+            else
+            {
+                timeOrPages = Convert.ToInt32(StringInput("\nInserisci la durata:"));
+            }
 
-        break;
+            AddDocument(code, title, year, sector, available, position, author, type, timeOrPages);
+
+            break;
+
+        case 2:
+
+            string docToSearch = StringInput("\nInserisci il titolo da cercare");
+            Console.WriteLine("Risultato ricerca:\n\n");
+            PrintDocument(docToSearch);
+
+
+                break;
+
+        default:
+
+            exit = true;
+
+            break;
+    }
 }
 
-
+static void ShowMenu()
+{
+    Console.WriteLine("1-Aggiungi\n2-Verifica disponibilità");
+}
 
 static string StringInput(string message)
 {
@@ -126,6 +146,39 @@ static void AddDocument(string dato1, string dato2, int dato3, string dato4, int
     catch (Exception ex)
     {
         Console.WriteLine(ex.Message);
+    }
+    finally
+    {
+        connToDb.Close();
+    }
+}
+
+
+static void PrintDocument(string name)
+{
+
+    string conn = "Data Source=localhost;Initial Catalog=db-biblioteca;Integrated Security=True";
+    SqlConnection connToDb = new SqlConnection(conn);
+
+    try
+    {
+        connToDb.Open();
+        string query = "SELECT * FROM documents where title = @name;";
+
+        SqlCommand cmd = new SqlCommand(query, connToDb);
+        cmd.Parameters.Add(new SqlParameter("@name", name));
+        SqlDataReader reader = cmd.ExecuteReader();
+        while (reader.Read())
+        {
+            long id = reader.GetInt64(0);
+            string title = reader.GetString(2);
+            int disponibility = reader.GetByte(5);
+            Console.WriteLine($"#{id} - {title} - Disponibile: {(disponibility == 1 ? "si": "no" )}" );
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.ToString());
     }
     finally
     {
