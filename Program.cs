@@ -49,6 +49,7 @@ while (!exit)
     {
         case 1:
 
+            #region Richiesta Dati
             string code = StringInput("\nInserisci il codice:");
             string title = StringInput("\nInserisci il titolo:");
             int year = Convert.ToInt32(StringInput("\nInserisci l'anno:"));
@@ -65,7 +66,8 @@ while (!exit)
             else
             {
                 timeOrPages = Convert.ToInt32(StringInput("\nInserisci la durata:"));
-            }
+            } 
+            #endregion
 
             AddDocument(code, title, year, sector, available, position, author, type, timeOrPages);
 
@@ -78,8 +80,17 @@ while (!exit)
             PrintDocument(docToSearch);
 
 
-                break;
+            break;
+        case 3:
+            string UName = StringInput("\nInserisci il nome:");
+            string USurname = StringInput("\nInserisci il cognome:");
+            string UEmail = StringInput("\nInserisci l'email:");
+            string UPassword = StringInput("\nInserisci la password:");
+            long UPhoneNumber = Convert.ToInt64(StringInput("\nInserisci il numero di telefono (es. 3336091929:"));
 
+            InsertUser(UName, USurname, UEmail, UPassword, UPhoneNumber);
+
+            break;
         default:
 
             exit = true;
@@ -90,7 +101,7 @@ while (!exit)
 
 static void ShowMenu()
 {
-    Console.WriteLine("1-Aggiungi\n2-Verifica disponibilità");
+    Console.WriteLine("1-Aggiungi Documento\n2-Verifica disponibilità\n3-Aggiungi Utente");
 }
 
 static string StringInput(string message)
@@ -153,7 +164,6 @@ static void AddDocument(string dato1, string dato2, int dato3, string dato4, int
     }
 }
 
-
 static void PrintDocument(string name)
 {
 
@@ -179,6 +189,43 @@ static void PrintDocument(string name)
     catch (Exception ex)
     {
         Console.WriteLine(ex.ToString());
+    }
+    finally
+    {
+        connToDb.Close();
+    }
+}
+
+static void InsertUser(string dato1, string dato2, string dato3, string dato4, long dato5)
+{
+    string conn = "Data Source=localhost;Initial Catalog=db-biblioteca;Integrated Security=True";
+    SqlConnection connToDb = new SqlConnection(conn);
+
+
+
+    try
+    {
+        connToDb.Open();
+
+        
+        
+        string query = "INSERT INTO users (name, surname, email, password, phone_number ) VALUES (@name, @surname, @email, @password, @phone_number);";
+        
+
+
+        SqlCommand cmd = new SqlCommand(query, connToDb);
+        cmd.Parameters.Add(new SqlParameter("@name", dato1));
+        cmd.Parameters.Add(new SqlParameter("@surname", dato2));
+        cmd.Parameters.Add(new SqlParameter("@email", dato3));
+        cmd.Parameters.Add(new SqlParameter("@password", dato4));
+        cmd.Parameters.Add(new SqlParameter("@phone_number", dato5));
+       
+
+        int affectedRows = cmd.ExecuteNonQuery();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(ex.Message);
     }
     finally
     {
